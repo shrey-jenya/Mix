@@ -37,11 +37,11 @@ const AddTask = () => {
 			toast.success("Task entered successfully");
 		}
 	};
-	const handleEdit = (newLabel) => {
+	const handleEdit = (todo, newLabel) => {
 		dispatch(editTodo({ id: todo.id, updateLabel: newLabel }));
 		// dispatch(setInputTaskValue(newLabel));
-		console.log("cl;iocjk");
-		toast.success("Task edited successfully");
+		console.log("clicked");
+		toast.warning("currently edit is disabled");
 	};
 	return (
 		<div>
@@ -91,7 +91,9 @@ const AddTask = () => {
 								</li>
 								<Button
 									onDelete={() => deleteHandler(todo.id)}
-									onEdit={(newLabel) => handleEdit(newLabel)}
+									onEdit={(newLabel) =>
+										handleEdit(todo, newLabel)
+									}
 								/>
 							</div>
 						))
