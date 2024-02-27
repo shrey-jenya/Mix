@@ -9,10 +9,18 @@ import { Flip, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Button from "./buttons/Button";
 const AddTask = () => {
+	const dispatch = useDispatch();
 	const values = useSelector((state) => state.todo.inputTaskValue);
 	const todos = useSelector((state) => state.todo.todos);
+	const searchQuery = useSelector((state) => state.todo.searchQuery);
+	const filteredTodos = todos.filter(
+		(todo) =>
+			todo &&
+			todo.label &&
+			todo.label.toLowerCase().includes(searchQuery.toLowerCase())
+	);
+	
 
-	const dispatch = useDispatch();
 	const addHandler = () => {
 		if (values.trim() !== "") {
 			dispatch(addTodo());
@@ -80,8 +88,8 @@ const AddTask = () => {
 			</div>
 			<div className="grid grid-cols-1 gap-4 p-4">
 				<ul className="list-decimal list-outside">
-					{todos.length ? (
-						todos.map((todo) => (
+					{filteredTodos.length ? (
+						filteredTodos.map((todo) => (
 							<div
 								key={todo.id}
 								className="shadow-2xl bg-gray-100 bg-gradient-to-br from-gray-50 via-gray-200 to-gray-300 mb-1 p-2 rounded-lg flex justify-around item-center"
@@ -98,7 +106,7 @@ const AddTask = () => {
 							</div>
 						))
 					) : (
-						<h1 className="text-center text-8xl mb-10 animate-bounce  ">
+						<h1 className="text-center text-8xl mb-10 animate-bounce">
 							No todos...
 						</h1>
 					)}

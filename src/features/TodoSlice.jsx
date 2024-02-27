@@ -14,6 +14,7 @@ const ToDoSlice = createSlice({
 			},
 		],
 		inputTaskValue: "",
+		searchQuery: "",
 	},
 	reducers: {
 		addTodo: (state) => {
@@ -47,8 +48,11 @@ const ToDoSlice = createSlice({
 				),
 			};
 		},
+		setSearchQuery:(state,action)=>{
+			state.searchQuery=action.payload
+		}
 	},
 });
-export const { addTodo, deleteTodo, setInputTaskValue, editTodo } =
+export const { addTodo, deleteTodo, setInputTaskValue, editTodo,setSearchQuery } =
 	ToDoSlice.actions;
 export default ToDoSlice.reducer;
