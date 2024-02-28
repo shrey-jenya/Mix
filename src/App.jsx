@@ -7,7 +7,7 @@ import Archived from "./Pages/Archived";
 const App = () => {
 	return (
 		<div>
-			<marquee  className='text-3xl text-teal-500 ' >	This site is currently under construction. The edit and archive features are not working</marquee>
+			<marquee  className='text-3xl text-teal-500 ' >	This site is currently under construction. </marquee>
 			<Navbar />
 			<Routes>
 				<Route path="/" element={<Home />} />

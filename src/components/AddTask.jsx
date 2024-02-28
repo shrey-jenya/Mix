@@ -9,21 +9,19 @@ import { Flip, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Button from "./buttons/Button";
 import { useState } from "react";
-
 const AddTask = () => {
 	const dispatch = useDispatch();
 	const values = useSelector((state) => state.todo.inputTaskValue);
 	const todos = useSelector((state) => state.todo.todos);
 	const searchQuery = useSelector((state) => state.todo.searchQuery);
 	const [updateId, setUpdateId] = useState(null);
-
+	// const [updatedLabel, setUpdatedLabel] = useState("");
 	const filteredTodos = todos.filter(
 		(todo) =>
 			todo &&
 			todo.label &&
 			todo.label.toLowerCase().includes(searchQuery.toLowerCase())
 	);
-
 	const addHandler = () => {
 		if (values.trim() !== "") {
 			dispatch(addTodo());
@@ -32,29 +30,31 @@ const AddTask = () => {
 			toast.error("Please enter a task");
 		}
 	};
-
 	const handleChange = (e) => {
 		const inputValue = e.target.value;
 		dispatch(setInputTaskValue(inputValue));
 	};
-
 	const deleteHandler = (taskId) => {
 		dispatch(deleteTodo(taskId));
 		toast.success("Task deleted successfully");
 	};
-
 	const handleKeyEnter = (e) => {
 		if (e.key === "Enter") {
 			dispatch(addTodo());
 			toast.success("Task entered successfully");
 		}
 	};
-
 	const updateHandler = (taskId) => {
-		setUpdateId(taskId); // Set the ID of the todo being edited
-		toast.success('Task updated successfully');
+		setUpdateId(taskId);
 	};
-
+	const handleBlur = () => {
+		setUpdateId(null);
+	};
+	const handleKeyPress = (e) => {
+		if (e.key === "Enter") {
+			setUpdateId(null); // Reset updateId when "Enter" is pressed
+		}
+	};
 	return (
 		<div>
 			<div className="mb-6 flex items-center gap-3 p-5">
@@ -111,6 +111,8 @@ const AddTask = () => {
 													})
 												)
 											}
+											onBlur={handleBlur}
+											onKeyDown={handleKeyPress}
 										/>
 									) : (
 										todo.label
@@ -132,5 +134,4 @@ const AddTask = () => {
 		</div>
 	);
 };
-
 export default AddTask;
