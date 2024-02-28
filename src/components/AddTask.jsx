@@ -1,59 +1,22 @@
 import { useDispatch, useSelector } from "react-redux";
 import {
 	addTodo,
-	archiveTodo,
 	deleteTodo,
-	editTodo,
 	setInputTaskValue,
+	updateTodo,
 } from "../features/TodoSlice";
 import { Flip, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Button from "./buttons/Button";
-// import TaskItem from "./EditTodo";
 import { useState } from "react";
-const AddTask = () => {
-	const [isEditing, setIsEditing] = useState(false);
-	const [editedLabel, setEditedLabel] = useState({ id: "", label: "" });
 
+const AddTask = () => {
 	const dispatch = useDispatch();
 	const values = useSelector((state) => state.todo.inputTaskValue);
 	const todos = useSelector((state) => state.todo.todos);
 	const searchQuery = useSelector((state) => state.todo.searchQuery);
-	// ! Edit Handler
-	const handleBlur = () => {
-		console.log('input blurred')
-		handleSave();
-	};
-	const handleEdit = (todo) => {
-		setEditedLabel({ id: todo.id, label: todo.label });
-		setIsEditing(true);
-	};
-	const handleSave = () => {
-		if (editedLabel.label.trim() !== "") {
-			console.log("Saving edited task");
-			dispatch(
-				editTodo({
-					id: editedLabel.id,
-					updatedLabel: editedLabel.label,
-				})
-			);
-			setIsEditing(false);
-		} else {
-			console.log("Edited label is empty");
-		}
-	};
+	const [updateId, setUpdateId] = useState(null);
 
-	const handleInputChange = (e) => {
-		setEditedLabel({ ...editedLabel, label: e.target.value });
-	};
-
-	const handleKeyDown = (e) => {
-		if (e.key === "Enter") {
-			e.preventDefault();
-			e.stopPropagation();
-			handleSave();
-		}
-	};
 	const filteredTodos = todos.filter(
 		(todo) =>
 			todo &&
@@ -66,9 +29,10 @@ const AddTask = () => {
 			dispatch(addTodo());
 			toast.success("Task added successfully");
 		} else {
-			toast.error("please enter a task");
+			toast.error("Please enter a task");
 		}
 	};
+
 	const handleChange = (e) => {
 		const inputValue = e.target.value;
 		dispatch(setInputTaskValue(inputValue));
@@ -76,25 +40,21 @@ const AddTask = () => {
 
 	const deleteHandler = (taskId) => {
 		dispatch(deleteTodo(taskId));
-		console.log("deleted");
 		toast.success("Task deleted successfully");
 	};
+
 	const handleKeyEnter = (e) => {
 		if (e.key === "Enter") {
 			dispatch(addTodo());
 			toast.success("Task entered successfully");
 		}
 	};
-	// const handleEdit = (todo, newLabel) => {
-	// 	dispatch(editTodo({ id: todo.id, updateLabel: newLabel }));
-	// 	// dispatch(setInputTaskValue(newLabel));
-	// 	console.log("clicked");
-	// 	toast.warning("currently edit is disabled");
-	// };
-	const archiveHandler = (taskID) => {
-		dispatch(archiveTodo(taskID));
-		toast.success("task Archived Successfully");
+
+	const updateHandler = (taskId) => {
+		setUpdateId(taskId); // Set the ID of the todo being edited
+		toast.success('Task updated successfully');
 	};
+
 	return (
 		<div>
 			<div className="mb-6 flex items-center gap-3 p-5">
@@ -112,7 +72,7 @@ const AddTask = () => {
 				<button
 					onClick={addHandler}
 					type="button"
-					className=" hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-150 text-white p-4 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 "
+					className="hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-150 text-white p-4 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
 				>
 					Add
 				</button>
@@ -138,28 +98,27 @@ const AddTask = () => {
 								key={todo.id}
 								className="shadow-2xl bg-gray-100 bg-gradient-to-br from-gray-50 via-gray-200 to-gray-300 mb-1 p-2 rounded-lg flex justify-around item-center"
 							>
-								{isEditing && todo.id === editedLabel.id ? (
-									<>
+								<li className="ml-2 w-96 px-5 py-2 select-all">
+									{todo.id === updateId ? (
 										<input
 											type="text"
-											onBlur={handleBlur}
-											value={editedLabel.label}
-											onChange={handleInputChange}
-											onKeyDown={handleKeyDown}
-											autoFocus
+											value={todo.label}
+											onChange={(e) =>
+												dispatch(
+													updateTodo({
+														id: todo.id,
+														label: e.target.value,
+													})
+												)
+											}
 										/>
-										{/* <button onClick={handleEdit}>edit</button> */}
-									</>
-								) : (
-									<li className="ml-2 w-96 px-5 py-2 select-all">
-										{todo.label}
-									</li>
-								)}
+									) : (
+										todo.label
+									)}
+								</li>
 								<Button
 									onDelete={() => deleteHandler(todo.id)}
-									onEdit={() => handleEdit(todo)}
-									// todo={todo}
-									onArchive={() => archiveHandler(todo.id)}
+									onUpdate={() => updateHandler(todo.id)}
 								/>
 							</div>
 						))
@@ -173,4 +132,5 @@ const AddTask = () => {
 		</div>
 	);
 };
+
 export default AddTask;

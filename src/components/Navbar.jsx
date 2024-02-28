@@ -4,11 +4,7 @@ import { Link, NavLink } from "react-router-dom";
 import { setSearchQuery } from "../features/TodoSlice";
 const Navbar = () => {
 	const dispatch = useDispatch();
-	// const [archivedCount, setArchivedCount] = useState(0);
-	// const archivedTodos = useSelector((state) => state.todo.archivedTodos);
-	// useEffect(() => {
-	// 	setArchivedCount(archivedTodos.length);
-	// }, [archivedTodos]);
+	
 	const handleSearchChange = (e) => {
 		dispatch(setSearchQuery(e.target.value));
 	};
@@ -26,7 +22,7 @@ const Navbar = () => {
 							className="h-8"
 							alt="Logo"
 						/>
-						<span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+						<span className="self-center text-2xl font-semibold whitespace-nowrap font-mono italic tracking-wide text-blue-600 dark:text-white">
 							X-ToDo
 						</span>
 					</NavLink>
