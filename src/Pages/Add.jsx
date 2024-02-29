@@ -1,35 +1,64 @@
-import { Button, Checkbox, Label, TextInput } from "flowbite-react";
-import { Link } from "react-router-dom";
+import axios from "axios";
+import {
+	Button,
+	Checkbox,
+	FloatingLabel,
+	Label,
+	TextInput,
+} from "flowbite-react";
+import { useState } from "react";
+import { toast } from "react-toastify";
 
-function Add() {
+function Add({ addUser }) {
+	const [name, setName] = useState("");
+	const [email, setEmail] = useState("");
+	const [username, setUsername] = useState("");
+	const handleSubmit = async () => {
+		try {
+			const newUser = {
+				name: name,
+				email: email,
+				username: username,
+			};
+			const res = await axios.post(
+				`https://jsonplaceholder.typicode.com/users`,
+				newUser
+			);
+			addUser(res.data);
+			setEmail("");
+			setName("");
+			setUsername("");
+			// toast.success('User added successfully')
+		} catch (error) {
+			console.log(error);
+		}
+	};
 	return (
-		<form className="flex max-w-md flex-col gap-4">
-			<div>
-				<div className="mb-2 block">
-					<Label htmlFor="email1" value="Your email" />
-				</div>
-				<TextInput
-					id="email1"
-					type="email"
-					placeholder="name@flowbite.com"
-					required
-				/>
+		<div className="p-5 mt-2  ">
+			<FloatingLabel
+				onChange={(e) => setName(e.target.value)}
+				value={name}
+				variant="standard"
+				label="name"
+			/>
+			<FloatingLabel
+				onChange={(e) => setUsername(e.target.value)}
+				value={username}
+				variant="standard"
+				label="username"
+			/>
+			<FloatingLabel
+				onChange={(e) => setEmail(e.target.value)}
+				value={email}
+				variant="standard"
+				label="email"
+			/>
+			<div className="flex justify-center">
+				<Button onClick={handleSubmit} pill color="blue">
+					submit
+				</Button>
 			</div>
-			<div>
-				<div className="mb-2 block">
-					<Label htmlFor="password1" value="Your password" />
-				</div>
-				<TextInput id="password1" type="password" required />
-			</div>
-			<div className="flex items-center gap-2">
-				<Checkbox id="remember" />
-				<Label htmlFor="remember">Remember me</Label>
-			</div>
-			<Button type="submit">Submit</Button>
-			<Link to="/">
-				<Button> Home </Button>
-			</Link>
-		</form>
+		</div>
 	);
 }
 export default Add;
