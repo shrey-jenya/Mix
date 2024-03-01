@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table } from "flowbite-react";
+import { Button, Checkbox, Table } from "flowbite-react";
 import axios from "axios";
 import { FaSort } from "react-icons/fa";
 import Add from "./Add";
 import { v4 as uuidv4 } from "uuid";
 import { ToastContainer } from "react-toastify";
+
 const Home = () => {
 	const [users, setUsers] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -12,6 +13,7 @@ const Home = () => {
 	const [sortOrder, setSortOrder] = useState(null);
 	const [showAddForm, setShowAddForm] = useState(false);
 	const [editUser, setEditUser] = useState(null);
+	const [selectedUserIds, setSelectedUserIds] = useState([]);
 	const userData = async () => {
 		try {
 			const response = await axios.get(
@@ -53,8 +55,8 @@ const Home = () => {
 			setSortOrder("asc");
 		}
 		setSortField(field);
-		setUsers(sortedUsers)
-		setSortOrder((prevOrder=>(prevOrder ? 'desc' : 'asc')))
+		setUsers(sortedUsers);
+		setSortOrder((prevOrder) => (prevOrder ? "desc" : "asc"));
 	};
 
 	const deleteHandler = (userID) => {
@@ -71,7 +73,7 @@ const Home = () => {
 	};
 	const editHandler = (user) => {
 		setEditUser(user);
-		console.log('edited')
+		console.log("edited");
 		setShowAddForm(true);
 	};
 	const updateUsers = (updatedUserParam) => {
@@ -82,7 +84,26 @@ const Home = () => {
 		setEditUser(null);
 		setShowAddForm(false);
 	};
-
+	// ! handleSelected User
+	const handleCheckboxChange = (event, userId) => {
+		if (event.target.checked) {
+			setSelectedUserIds((prevSelectedUserIds) => [
+				...prevSelectedUserIds,
+				userId,
+			]);
+		} else {
+			setSelectedUserIds((prevSelectedUserIds) =>
+				prevSelectedUserIds.filter((id) => id !== userId)
+			);
+		}
+	};
+	const deleteSelectedUsers = () => {
+		const updatedUsers = users.filter(
+			(user) => !selectedUserIds.includes(user.id)
+		);
+		setUsers(updatedUsers);
+		setSelectedUserIds([]);
+	};
 	return (
 		<div>
 			{showAddForm && (
@@ -97,10 +118,36 @@ const Home = () => {
 					{showAddForm ? "Hide Form" : "Add User"}
 				</Button>
 			</div>
-
+			{selectedUserIds.length > 0 && (
+					<div className="flex justify-center p-4">
+						<Button
+							color="red"
+							size="xs"
+							pill
+							onClick={deleteSelectedUsers}
+						>
+							Delete Selected
+						</Button>
+					</div>
+				)}
 			<div>
 				<Table hoverable striped>
 					<Table.Head>
+						<Table.HeadCell className="w-1">
+							<p className="flex items-center ">
+								<Checkbox
+									className="me-3"
+									onChange={(event) =>
+										setSelectedUserIds(
+											event.target.checked
+												? users.map((user) => user.id)
+												: []
+										)
+									}
+								/>
+								Select
+							</p>
+						</Table.HeadCell>
 						<Table.HeadCell
 							onClick={() => sortHandler("name")}
 							className="cursor-pointer flex items-center"
@@ -137,6 +184,16 @@ const Home = () => {
 									key={user.id}
 									className="bg-white dark:border-gray-700 dark:bg-gray-800"
 								>
+									<Table.Cell>
+										<Checkbox
+											checked={selectedUserIds.includes(
+												user.id
+											)}
+											onChange={(e) =>
+												handleCheckboxChange(e, user.id)
+											}
+										/>
+									</Table.Cell>
 									<Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
 										{user.name}
 									</Table.Cell>
@@ -171,6 +228,7 @@ const Home = () => {
 						)}
 					</Table.Body>
 				</Table>
+		
 			</div>
 		</div>
 	);
