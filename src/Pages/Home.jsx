@@ -3,7 +3,7 @@ import { Button, Table } from "flowbite-react";
 import axios from "axios";
 import { FaSort } from "react-icons/fa";
 import Add from "./Add";
-import {v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4 } from "uuid";
 import { ToastContainer } from "react-toastify";
 const Home = () => {
 	const [users, setUsers] = useState([]);
@@ -11,6 +11,7 @@ const Home = () => {
 	const [sortFiled, setSortField] = useState(null);
 	const [sortOrder, setSortOrder] = useState(null);
 	const [showAddForm, setShowAddForm] = useState(false);
+	const [editUser, setEditUser] = useState(null);
 	const userData = async () => {
 		try {
 			const response = await axios.get(
@@ -30,6 +31,7 @@ const Home = () => {
 	// ! toggle form
 	const toggleAddForm = () => {
 		setShowAddForm(!showAddForm);
+		setEditUser(null);
 	};
 	// ! sort handler
 	const sortHandler = (field) => {
@@ -51,29 +53,51 @@ const Home = () => {
 			setSortOrder("asc");
 		}
 		setSortField(field);
+		setUsers(sortedUsers)
+		setSortOrder((prevOrder=>(prevOrder ? 'desc' : 'asc')))
 	};
 
 	const deleteHandler = (userID) => {
 		console.log("Deleting user with ID:", userID);
-		const updatedUsers = users.filter((user) => user.id !== userID);
-		console.log("Updated users after deletion:", updatedUsers);
-		setUsers(updatedUsers);
+		const updatedUsers1 = users.filter((user) => user.id !== userID);
+		console.log("Updated users after deletion:", updatedUsers1);
+		setUsers(updatedUsers1);
 	};
 
 	// ! addUser
 	const addUser = (newUser) => {
-		const id = uuidv4()
-		setUsers([...users, {...newUser,	id}]);
+		const id = uuidv4();
+		setUsers([...users, { ...newUser, id }]);
 	};
+	const editHandler = (user) => {
+		setEditUser(user);
+		console.log('edited')
+		setShowAddForm(true);
+	};
+	const updateUsers = (updatedUserParam) => {
+		const updatedUserArray = users.map((user) =>
+			user.id === updatedUserParam.id ? updatedUserParam : user
+		);
+		setUsers(updatedUserArray);
+		setEditUser(null);
+		setShowAddForm(false);
+	};
+
 	return (
 		<div>
-			{showAddForm && <Add addUser={addUser} />}
+			{showAddForm && (
+				<Add
+					addUser={addUser}
+					updatedUser={updateUsers}
+					user={editUser}
+				/>
+			)}
 			<div className="flex justify-center p-4">
 				<Button onClick={toggleAddForm} pill>
 					{showAddForm ? "Hide Form" : "Add User"}
 				</Button>
 			</div>
-		
+
 			<div>
 				<Table hoverable striped>
 					<Table.Head>
@@ -119,7 +143,12 @@ const Home = () => {
 									<Table.Cell>{user.username}</Table.Cell>
 									<Table.Cell>{user.email}</Table.Cell>
 									<Table.Cell className="cursor-pointer flex pe-1 gap-2">
-										<Button color="blue" size="xs" pill>
+										<Button
+											color="blue"
+											size="xs"
+											pill
+											onClick={() => editHandler(user)}
+										>
 											Edit
 										</Button>
 										<Button
