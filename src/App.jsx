@@ -1,21 +1,27 @@
-import React from "react";
-import BannerCom from "./components/Banner";
+import React, { useState } from "react";
 import Home from "./pages/Home";
 import { Route, Routes } from "react-router-dom";
-import Add from "./pages/Add";
+import Nav from "./Nav/Nav";
+import Login from "./pages/Login";
+import { AuthProvider } from "./hooks/useAuth";
+import Secret from "./pages/Secret";
+import ProtectedRoute from "./pages/ProtectedRoute";
 
-        
 const App = () => {
-	return (
 
-			<div>
-		
-				<BannerCom />
-				<Routes>
-					<Route path="/" element={<Home />} />
-					<Route path="/add" element={<Add />} />
-				</Routes>
-			</div>
+	return (
+		<AuthProvider>
+			<Nav />
+			<Routes>
+				<Route path="/" element={<Home />} />
+				<Route path="/login" element={<Login />} />
+				<Route
+					path="/secret"
+					element={<ProtectedRoute> <Secret /> </ProtectedRoute>}
+				/>
+
+			</Routes>
+		</AuthProvider>
 	);
 };
 
